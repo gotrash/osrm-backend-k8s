@@ -1,22 +1,22 @@
-FROM peterevans/xenial-gcloud:1.2.23
+FROM python:3
 
 LABEL \
-  maintainer="Peter Evans <mail@peterevans.dev>" \
+  maintainer="Alex Scott <codetheorist@outlook.com>" \
   org.opencontainers.image.title="osrm-backend-k8s" \
-  org.opencontainers.image.description="Open Source Routing Machine (OSRM) osrm-backend for Kubernetes on Google Container Engine (GKE)." \
-  org.opencontainers.image.authors="Peter Evans <mail@peterevans.dev>" \
-  org.opencontainers.image.url="https://github.com/peter-evans/osrm-backend-k8s" \
-  org.opencontainers.image.vendor="https://peterevans.dev" \
+  org.opencontainers.image.description="Open Source Routing Machine (OSRM) osrm-backend for Kubernetes." \
+  org.opencontainers.image.authors="Alex Scott <codetheorist@outlook.com>" \
+  org.opencontainers.image.url="https://github.com/gotrash/osrm-backend-k8s" \
+  org.opencontainers.image.vendor="https://github.com/gotrash" \
   org.opencontainers.image.licenses="MIT"
 
-ENV OSRM_VERSION 5.22.0
+ENV OSRM_VERSION 5.27.1
 
 # Let the container know that there is no TTY
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install packages
 RUN apt-get -y update \
- && apt-get install -y -qq --no-install-recommends \
+  && apt-get install -y -qq \
     build-essential \
     cmake \
     curl \
