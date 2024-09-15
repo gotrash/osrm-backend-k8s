@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ "$OSRM_MODE" != "CREATE" ] && [ "$OSRM_MODE" != "RESTORE" ]; then
-    # Default to CREATE
-    OSRM_MODE="CREATE"
+if [ "$OSRM_MODE" != "CREATE" ] && [ "$OSRM_MODE" != "RESTORE" ] && [ "$OSRM_MODE" != "RUN" ]; then
+    # Default to RUN
+    OSRM_MODE="RUN"
 fi
 
 # Defaults
@@ -16,24 +16,22 @@ OSRM_PROJECT_ID=${OSRM_PROJECT_ID:=""}
 OSRM_GS_BUCKET=${OSRM_GS_BUCKET:=""}
 OSRM_MAX_TABLE_SIZE=${OSRM_MAX_TABLE_SIZE:="8000"}
 
-
 _sig() {
-  kill -TERM $child 2>/dev/null
+    kill -TERM $child 2>/dev/null
 }
 trap _sig SIGKILL SIGTERM SIGHUP SIGINT EXIT
 
-
 if [ "$OSRM_MODE" == "CREATE" ]; then
-    
+
     # Retrieve the PBF file
     curl -L $OSRM_PBF_URL --create-dirs -o $OSRM_DATA_PATH/$OSRM_DATA_LABEL.osm.pbf
-    
+
     # Build the graph
     osrm-extract $OSRM_DATA_PATH/$OSRM_DATA_LABEL.osm.pbf -p /osrm-profiles/$OSRM_GRAPH_PROFILE.lua
     osrm-contract $OSRM_DATA_PATH/$OSRM_DATA_LABEL.osrm
 
     if [ ! -z "$OSRM_SA_KEY_PATH" ] && [ ! -z "$OSRM_PROJECT_ID" ] && [ ! -z "$OSRM_GS_BUCKET" ]; then
-    
+
         # Activate the service account to access storage
         gcloud auth activate-service-account --key-file $OSRM_SA_KEY_PATH
         # Set the Google Cloud project ID
@@ -43,7 +41,7 @@ if [ "$OSRM_MODE" == "CREATE" ]; then
         gsutil -m cp $OSRM_DATA_PATH/*.osrm* $OSRM_GS_BUCKET/$OSRM_DATA_LABEL
 
     fi
-    
+
 else
 
     if [ ! -z "$OSRM_SA_KEY_PATH" ] && [ ! -z "$OSRM_PROJECT_ID" ] && [ ! -z "$OSRM_GS_BUCKET" ]; then
@@ -57,7 +55,7 @@ else
         gsutil -m cp $OSRM_GS_BUCKET/$OSRM_DATA_LABEL/*.osrm* $OSRM_DATA_PATH
 
     fi
-    
+
 fi
 
 # Start serving requests
